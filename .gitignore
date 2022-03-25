@@ -1,0 +1,5 @@
+__pycache__
+irdl.egg-info
+log
+.pytest_cache
+/config

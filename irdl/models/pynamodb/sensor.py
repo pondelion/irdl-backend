@@ -1,5 +1,7 @@
+from datetime import datetime as dt
+
 from pynamodb.models import Model
-from pynamodb.attributes import UnicodeAttribute, NumberAttribute
+from pynamodb.attributes import UnicodeAttribute, NumberAttribute, UTCDateTimeAttribute
 
 from ...utils.config import AWSConfig
 
@@ -40,3 +42,4 @@ class LocalSensorModel(Model):
     value = NumberAttribute(null=False)
     vendor = UnicodeAttribute(null=False)
     version = NumberAttribute(null=False)
+    created_at = UTCDateTimeAttribute(default=dt.now())

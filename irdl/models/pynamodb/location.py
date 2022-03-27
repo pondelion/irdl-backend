@@ -1,5 +1,7 @@
+from datetime import datetime as dt
+
 from pynamodb.models import Model
-from pynamodb.attributes import UnicodeAttribute, NumberAttribute
+from pynamodb.attributes import UnicodeAttribute, NumberAttribute, UTCDateTimeAttribute
 
 from ...utils.config import AWSConfig
 
@@ -26,3 +28,4 @@ class LocalLocationModel(Model):
     datetime = UnicodeAttribute(range_key=True)
     lat = NumberAttribute(null=False)
     lng = NumberAttribute(null=False)
+    created_at = UTCDateTimeAttribute(default=dt.now())

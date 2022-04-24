@@ -1,3 +1,24 @@
+[tool.poetry]
+name = "irdl-backend"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+packages = [
+    { include = "irdl" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pynamodb = "^5.2.1"
+PyYAML = "^6.0"
+fastapi = "^0.75.2"
+uvicorn = {extras = ["standard"], version = "^0.17.6"}
+fastapi-cloudauth = "^0.4.3"
+boto3 = "^1.21.46"
+numpy = "^1.22.3"
+
+[tool.poetry.dev-dependencies]
+
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -22,6 +22,18 @@ class Settings(BaseSettings):
     # def MYSQL_DATABASE_URI(self) -> str:
     #     return f'mysql://{self.DB_USERNAME}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?charset=utf8mb4'
 
+    AWS_REGION_NAME: str = 'ap-northeast-1'
+
+    AWS_IOT_COMMAND_TOPIC_NAME: str = 'irdl/command'
+    AWS_IOT_LOCATION_TOPIC_NAME: str = 'irdl/logging/location'
+    AWS_IOT_SENSOR_TOPIC_NAME: str = 'irdl/logging/sensor'
+
+    S3_BUCKET_NAME: str = 'irdl'
+
+    @property
+    def S3_CAMERA_IMAGE_URI(self) -> str:
+        return os.path.join('s3://', self.S3_BUCKET_NAME, 'camera')
+
 
 settings = Settings(
     SERVER_HOST='http://127.0.0.0.1',

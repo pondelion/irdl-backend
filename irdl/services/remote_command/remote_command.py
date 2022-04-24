@@ -2,12 +2,14 @@ from datetime import datetime
 from enum import Enum
 import os
 from typing import Dict, Optional
+import tempfile
 
 import numpy as np
 from pydantic import BaseModel
 
 from .publisher import MessagePublisher
 from ...settings import settings
+from ...repositories.storage.s3 import BaseS3Repository
 
 
 class CommandList(Enum):
@@ -25,20 +27,25 @@ class RemoteCommand:
 
     def __init__(self):
         self._publisher = MessagePublisher()
+        self._s3 = BaseS3Repository()
 
     def take_picture(self, device_name: str, s3_filepath: str) -> np.ndarray:
         topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{device_name}'
         cmd_json = {
             'cmd': CommandList.TAKE_PICTURE.value,
-            'params': {
-                's3_filepath': s3_filepath
-            }
+            's3_filepath': s3_filepath,
         }
         self._publisher.publish(
             topic=topic,
             message=cmd_json,
         )
-        print(f'published to {topic} : {cmd_json}')
+        local_filepath = os.path.join(tempfile.gettempdir(), os.path.basename(s3_filepath))
+        self._s3.get(
+            s3_filepath=s3_filepath,
+            local_filepath=local_filepath,
+            n_retry=30,
+            retry_interval_sec=0.2,
+        )
 
     def execute_command(self, device_name: str, remote_command_params: RemoteCommandParams):
         if remote_command_params.cmd == CommandList.TAKE_PICTURE:

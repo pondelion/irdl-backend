@@ -12,5 +12,5 @@ params = RemoteCommandParams(
         # 's3_filepath': 's3://***'
     }
 )
-device_name = 'test_device'
+device_name = 'android_test_device1'
 rc.execute_command(device_name, params)

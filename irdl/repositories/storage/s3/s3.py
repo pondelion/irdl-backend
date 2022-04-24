@@ -1,5 +1,6 @@
 import os
-from typing import List
+from typing import List, Optional
+from time import sleep
 
 from ..base import BaseStorageRepository
 from ....aws.resource import S3 as S3_resource
@@ -41,12 +42,21 @@ class BaseS3Repository(BaseStorageRepository):
         self,
         s3_filepath: str,
         local_filepath: str,
+        n_retry: Optional[int] = None,
+        retry_interval_sec: float = 1.0,
     ) -> str:
         s3_prefix = f's3://{self._bucket_name}/'
         filepath = s3_filepath.replace(s3_prefix, '')
-        object = self._bucket.Object(filepath)
-        object.download_file(local_filepath)
-
+        try:
+            object = self._bucket.Object(filepath)
+            object.download_file(local_filepath)
+        except Exception as e:
+            print(e)
+            if n_retry is not None and n_retry > 0:
+                sleep(retry_interval_sec)
+                self.get(s3_filepath, local_filepath, n_retry-1, retry_interval_sec)
+            else:
+                raise e
         return local_filepath
 
     def get_filelist(

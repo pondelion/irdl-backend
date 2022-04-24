@@ -15,20 +15,13 @@ router = APIRouter()
 remote_command = RemoteCommand()
 
 
-@router.post('')
+@router.post('/{device_name}')
 def remote_command(
-    current_user: CognitoClaims = Depends(auth.get_current_user),
+    device_name: str,
     remote_command_params: RemoteCommandParams,
-) -> Any:
-    device_name = current_user.username
-    return 'ok'
-
-
-@router.post('/')
-def remote_command(
     current_user: CognitoClaims = Depends(auth.get_current_user),
-    remote_command_params: RemoteCommandParams,
 ) -> Any:
+    remote_command.execute_command(device_name, remote_command_params)
     return 'ok'
 
 

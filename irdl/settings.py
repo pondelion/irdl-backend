@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     # SERVER_NAME: str
     SERVER_HOST: AnyHttpUrl
 
+    DISABLE_AUTH: bool = False
+
     # DB_USERNAME: str
     # DB_PASSWORD: str
     # DB_HOST: str
@@ -28,7 +30,7 @@ class Settings(BaseSettings):
     AWS_IOT_LOCATION_TOPIC_NAME: str = 'irdl/logging/location'
     AWS_IOT_SENSOR_TOPIC_NAME: str = 'irdl/logging/sensor'
 
-    S3_BUCKET_NAME: str = 'irdl'
+    S3_BUCKET_NAME: str = 'irdl-app'
 
     @property
     def S3_CAMERA_IMAGE_URI(self) -> str:
@@ -37,4 +39,5 @@ class Settings(BaseSettings):
 
 settings = Settings(
     SERVER_HOST='http://127.0.0.0.1',
+    DISABLE_AUTH=True
 )

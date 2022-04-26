@@ -9,7 +9,10 @@ from pydantic import BaseModel
 
 from .publisher import MessagePublisher
 from ...settings import settings
-from ...repositories.storage.s3 import BaseS3Repository
+from ...repositories.storage.s3 import (
+    RemoteS3Repository,
+    LocalS3Repository,
+)
 
 
 class CommandList(Enum):
@@ -27,7 +30,8 @@ class RemoteCommand:
 
     def __init__(self):
         self._publisher = MessagePublisher()
-        self._s3 = BaseS3Repository()
+        self._remote_s3_repo = RemoteS3Repository()
+        self._local_s3_repo = LocalS3Repository()
 
     def take_picture(self, device_name: str, s3_filepath: str) -> np.ndarray:
         topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{device_name}'
@@ -40,7 +44,7 @@ class RemoteCommand:
             message=cmd_json,
         )
         local_filepath = os.path.join(tempfile.gettempdir(), os.path.basename(s3_filepath))
-        self._s3.get(
+        self._remote_s3_repo.get(
             s3_filepath=s3_filepath,
             local_filepath=local_filepath,
             n_retry=30,

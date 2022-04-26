@@ -1,0 +1,82 @@
+service: irdl-lambda-object-detection
+
+# plugins:
+#   - serverless-offline
+
+provider:
+  name: aws
+  profile: default
+  stage: ${opt:stage,"dev"}
+  region: ap-northeast-1
+  memorySize: 8192
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - 's3:GetObject'
+            - 's3:PutObject'
+            - 's3:ListBucket'
+            # - 's3:*'
+          Resource:
+            - "*"
+        - Effect: 'Allow'
+          Action:
+            - 'dynamodb:GetItem'
+            - 'dynamodb:PutItem'
+            - 'dynamodb:UpdateItem'
+          Resource:
+            - "*"
+        - Effect: Allow
+          Action:
+            - 'ecr:*'
+            - 'ecr-public:*'
+            - 'sts:GetServiceBearerToken'
+          Resource:
+            - "*"
+        - Effect: 'Allow'
+          Action:
+            - 'lambda:*'
+            - 'cognito:*'
+            - 'apigateway:*'
+          Resource:
+            - ${env:COGNITO_USER_POOL_ARN}
+  environment:
+    TZ: Asia/Tokyo
+    DYNAMODB_TABLE_NAME: ${env:DYNAMODB_OD_RESULT_TABLE_NAME}
+
+functions:
+  object-detection-api:
+    image:
+      uri:
+        - ${env:IMAGE_URL}
+      command:
+        - api.detect_object_api
+    timeout: 900  # 60*15
+    events:
+      - http:
+          path: api/v1/detect_object
+          method: post
+          cors: true
+          integration: lambda
+          authorizer:
+            name: authorizer
+            arn: ${env:COGNITO_USER_POOL_ARN}
+    environment:
+      HOGE1: 'hoge1'
+  object-detection-s3-trigger:
+    image:
+      uri:
+        - ${env:IMAGE_URL}
+      command:
+        - api.detect_object_s3_trigger
+    timeout: 900  # 60*15
+    events:
+      - s3:
+          bucket: ${env:TRIGGER_S3_BUCKET}
+          event:
+            - "s3:ObjectCreated:*"
+          rules:
+            - prefix: camera
+            # - suffix: .png
+          existing: true

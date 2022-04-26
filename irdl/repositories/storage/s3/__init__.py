@@ -1,1 +1,4 @@
-from .s3 import BaseS3Repository
+from .s3 import (
+    RemoteS3Repository,
+    LocalS3Repository,
+)

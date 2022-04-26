@@ -58,16 +58,19 @@ class _AWSConfig(type):
         Logger.i('Config', f'Setting AWS_SECRET_ACCESS_KEY to {config["SECRET_ACCESS_KEY"][:4]}***')
     if 'REGION_NAME' in config:
         os.environ['AWS_DEFAULT_REGION'] = config['REGION_NAME']
-    if 'ENDPOINT_URL' not in config:
-        config['ENDPOINT_URL'] = None
-    else:
-        Logger.i('Config', f'Setting aws endpoint to {config["ENDPOINT_URL"]}')
     if 'AWS_REGION_NAME' in os.environ:
         config['REGION_NAME'] = os.environ['AWS_REGION_NAME']
     if 'AWS_COGNITO_USERPOOL_ID' in os.environ:
         config['COGNITO_USERPOOL_ID'] = os.environ['AWS_COGNITO_USERPOOL_ID']
     if 'AWS_COGNITO_CLIENT_ID' in os.environ:
         config['COGNITO_CLIENT_ID'] = os.environ['AWS_COGNITO_CLIENT_ID']
+
+    if 'MINIO_USERNAME' in os.environ:
+        config['LOCAL_ACCESS_KEY_ID'] = os.environ['MINIO_USERNAME']
+    if 'MINIO_PASSWORD' in os.environ:
+        config['LOCAL_SECRET_ACCESS_KEY'] = os.environ['MINIO_PASSWORD']
+    if 'MINIO_ENDPOINT_URL' in os.environ:
+        config['LOCAL_S3_ENDPOINT_URL'] = os.environ['MINIO_PASSWORD']
 
     def __getattr__(cls, key: str):
         try:

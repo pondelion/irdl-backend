@@ -4,26 +4,31 @@ from time import sleep
 
 from ..base import BaseStorageRepository
 from ....aws.resource import S3 as S3_resource
+from ....aws.resource_local import S3_LOCAL as S3_resource_local
 from ....settings import settings
 from ....utils.logger import Logger
 
 
 class BaseS3Repository(BaseStorageRepository):
 
-    def __init__(self, bucket_name: str = settings.S3_BUCKET_NAME):
+    def __init__(
+        self,
+        s3_resource,
+        bucket_name: str = settings.S3_BUCKET_NAME,
+    ):
         super().__init__()
         self._bucket_name = bucket_name
         try:
-            S3_resource.create_bucket(
+            s3_resource.create_bucket(
                 Bucket=bucket_name,
                 CreateBucketConfiguration={
                     'LocationConstraint': settings.AWS_REGION_NAME
                 },
             )
             Logger.w('S3', f'created bucket [{bucket_name}]')
-        except S3_resource.meta.client.exceptions.BucketAlreadyOwnedByYou as e:
+        except s3_resource.meta.client.exceptions.BucketAlreadyOwnedByYou as e:
             Logger.w('S3', f'bucket [{bucket_name}] already exists')
-        self._bucket = S3_resource.Bucket(bucket_name)
+        self._bucket = s3_resource.Bucket(bucket_name)
 
     def save(
         self,
@@ -94,3 +99,23 @@ class BaseS3Repository(BaseStorageRepository):
                 break
 
         return s3_filelist
+
+
+class LocalS3Repository(BaseS3Repository):
+
+    def __init__(
+        self,
+        s3_resource = S3_resource_local,
+        bucket_name: str = settings.S3_BUCKET_NAME,
+    ):
+        super().__init__(s3_resource, bucket_name)
+
+
+class RemoteS3Repository(BaseS3Repository):
+
+    def __init__(
+        self,
+        s3_resource = S3_resource,
+        bucket_name: str = settings.S3_BUCKET_NAME,
+    ):
+        super().__init__(s3_resource, bucket_name)

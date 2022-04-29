@@ -1,7 +1,8 @@
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_cloudauth.cognito import CognitoClaims
 from irdl.server.api import api_router
 from irdl.settings import settings
 from irdl.server.api.deps.auth import get_current_user
@@ -28,3 +29,10 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.get('/')
 def health_check():
     return 'healthy'
+
+
+@app.get('/auth_test')
+def auth_test(
+    current_user: CognitoClaims = Depends(get_current_user),
+):
+    return {'user_info': current_user}

@@ -70,7 +70,7 @@ class _AWSConfig(type):
     if 'MINIO_PASSWORD' in os.environ:
         config['LOCAL_SECRET_ACCESS_KEY'] = os.environ['MINIO_PASSWORD']
     if 'MINIO_ENDPOINT_URL' in os.environ:
-        config['LOCAL_S3_ENDPOINT_URL'] = os.environ['MINIO_PASSWORD']
+        config['LOCAL_S3_ENDPOINT_URL'] = os.environ['MINIO_ENDPOINT_URL']
 
     def __getattr__(cls, key: str):
         try:

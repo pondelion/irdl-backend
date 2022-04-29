@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 import os
+from threading import Thread
 from typing import Dict, Optional
 import tempfile
 
@@ -33,7 +34,7 @@ class RemoteCommand:
         self._remote_s3_repo = RemoteS3Repository()
         self._local_s3_repo = LocalS3Repository()
 
-    def take_picture(self, device_name: str, s3_filepath: str) -> np.ndarray:
+    def take_picture(self, device_name: str, s3_filepath: str) -> str:
         topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{device_name}'
         cmd_json = {
             'cmd': CommandList.TAKE_PICTURE.value,
@@ -50,6 +51,10 @@ class RemoteCommand:
             n_retry=30,
             retry_interval_sec=0.2,
         )
+        Thread(
+            target=lambda: self._local_s3_repo.save(local_filepath, s3_filepath),
+        ).start()
+        return local_filepath
 
     def execute_command(self, device_name: str, remote_command_params: RemoteCommandParams):
         if remote_command_params.cmd == CommandList.TAKE_PICTURE:

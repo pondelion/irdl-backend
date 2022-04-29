@@ -39,5 +39,5 @@ class Settings(BaseSettings):
 
 settings = Settings(
     SERVER_HOST='http://127.0.0.0.1',
-    DISABLE_AUTH=True
+    DISABLE_AUTH=False
 )

@@ -3,6 +3,7 @@ import os
 import yaml
 
 from .logger import Logger
+from ..settings import settings
 
 
 DEFAULT_AWS_FILEPATH = os.path.join(
@@ -71,6 +72,9 @@ class _AWSConfig(type):
         config['LOCAL_SECRET_ACCESS_KEY'] = os.environ['MINIO_PASSWORD']
     if 'MINIO_ENDPOINT_URL' in os.environ:
         config['LOCAL_S3_ENDPOINT_URL'] = os.environ['MINIO_ENDPOINT_URL']
+
+    config['DYNAMODB_LOCATION_DATA_TABLE_NAME'] = settings.DYNAMODB_LOCATION_DATA_TABLE_NAME
+    config['DYNAMODB_SENSOR_DATA_TABLE_NAME'] = settings.DYNAMODB_SENSOR_DATA_TABLE_NAME
 
     def __getattr__(cls, key: str):
         try:

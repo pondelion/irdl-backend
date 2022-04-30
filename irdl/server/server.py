@@ -1,11 +1,13 @@
 from typing import Optional
 
-from fastapi import FastAPI, Depends
+from fastapi import APIRouter, FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cloudauth.cognito import CognitoClaims
-from irdl.server.api import api_router
-from irdl.settings import settings
-from irdl.server.api.deps.auth import get_current_user
+
+from .api import api_router
+from .api.deps.auth import get_current_user
+from .api.routes.custom.logging import LoggingRoute
+from ..settings import settings
 
 
 app = FastAPI(title='irdl')
@@ -24,6 +26,7 @@ if settings.DISABLE_AUTH:
     app.dependency_overrides[get_current_user] = disable_auth_dep
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.router.route_class = LoggingRoute
 
 
 @app.get('/')

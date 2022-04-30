@@ -6,7 +6,7 @@ from pynamodb.expressions.condition import Comparison
 from pydantic import BaseModel
 
 
-ModelType = TypeVar('ModelType', bound=Base)
+ModelType = TypeVar('ModelType', bound=Model)
 CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
 UpdateSchemaType = TypeVar('UpdateSchemaType', bound=BaseModel)
 
@@ -17,7 +17,8 @@ class BaseDynamoDBRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
         self._model = model
 
     def get_all(self) -> List[ModelType]:
-        return list(self.model.scan())
+        # return [l.attribute_values for l in list(self._model.scan())]
+        return list(self._model.scan())
 
     def get(
         self,
@@ -31,11 +32,12 @@ class BaseDynamoDBRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
         kwargs = {}
         if filter_condition:
             kwargs['filter_condition'] = filter_condition
-        return list(self.model.query(*args, **kwargs))
+        # return [l.attribute_values for l in list(self._model.query(*args, **kwargs))]
+        return list(self._model.query(*args, **kwargs))
 
     def create(
         self,
         *,
         data: CreateSchemaType,
     ) -> ModelType:
-        self.model(**data.dict()).save()
+        self._model(**data.dict()).save()

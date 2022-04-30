@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends
 from fastapi_cloudauth.cognito import CognitoClaims
 
+from .custom.logging import LoggingRoute
 from ..deps import auth
 from .... import schemas, models
 from ....services.remote_command import (
@@ -13,7 +14,7 @@ from ....services.remote_command import (
 from ....utils.image import png_imgfile2base64_url
 
 
-router = APIRouter()
+router = APIRouter(route_class=LoggingRoute)
 rc = RemoteCommand()
 
 

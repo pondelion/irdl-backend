@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     AWS_IOT_SENSOR_TOPIC_NAME: str = 'irdl/logging/sensor'
 
     S3_BUCKET_NAME: str = 'irdl-app'
+    DYNAMODB_LOCATION_DATA_TABLE_NAME: str = 'irdl-location'
+    DYNAMODB_SENSOR_DATA_TABLE_NAME: str = 'irdl-sensor'
 
     @property
     def S3_CAMERA_IMAGE_URI(self) -> str:

@@ -13,13 +13,18 @@ class LocationRepository(BaseDynamoDBRepository[LocationModel, LocationInDBSchem
     def __init__(self):
         super().__init__(LocationModel)
 
-    def get_latest(self, device_name: str) -> LocalLocationModel:
-        location = LocationModel.query(
-            device_name,
-            scan_index_forward=False,
-            limit=1,
-        )
-        return list(location)[0]
+    def get_latest(self, device_name: Optional[str] = None) -> LocationModel:
+        if device_name is not None:
+            location = self._model.query(
+                device_name,
+                scan_index_forward=False,
+                limit=1,
+            )
+            location = list(location)
+        else:
+            location = self._model.scan()
+            location = [list(location)[-1]]
+        return location[0] if len(location) > 0 else None
 
 
 class LocationLocalRepository(BaseDynamoDBRepository[LocalLocationModel, LocationInDBSchema, LocationInDBSchema]):
@@ -27,10 +32,16 @@ class LocationLocalRepository(BaseDynamoDBRepository[LocalLocationModel, Locatio
     def __init__(self):
         super().__init__(LocalLocationModel)
 
-    def get_latest(self, device_name: str) -> LocalLocationModel:
-        location = LocationModel.query(
-            device_name,
-            scan_index_forward=False,
-            limit=1,
-        )
-        return list(location)[0]
+    def get_latest(self, device_name: Optional[str] = None) -> LocalLocationModel:
+        if device_name is not None:
+            location = self._model.query(
+                device_name,
+                scan_index_forward=False,
+                limit=1,
+            )
+            location = list(location)
+        else:
+            location = self._model.scan()
+            location = [list(location)[-1]]
+        location = list(location)
+        return location[0] if len(location) > 0 else None

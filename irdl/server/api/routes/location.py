@@ -17,7 +17,7 @@ router = APIRouter(route_class=LoggingRoute)
 def get_location(
     skip: int = 0,
     limit: int = 100,
-    current_user: CognitoClaims = Depends(auth.get_current_user),
+    current_user: CognitoClaims = Depends(auth.cognito_current_organization),
 ) -> Any:
     return 'ok'
 
@@ -26,7 +26,7 @@ def get_location(
 @router.get('/{device_name}')
 def get_location(
     device_name: str,
-    current_user: CognitoClaims = Depends(auth.get_current_user),
+    current_user: CognitoClaims = Depends(auth.cognito_current_organization),
 ) -> Any:
     locations = LocationModel.query(device_name)
     locations = [l.attribute_values for l in locations]

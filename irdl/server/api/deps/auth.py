@@ -2,8 +2,13 @@ from fastapi_cloudauth.cognito import Cognito, CognitoCurrentUser, CognitoClaims
 from irdl.utils.config import AWSConfig
 
 
-get_current_user = CognitoCurrentUser(
+cognito_current_device = CognitoCurrentUser(
     region=AWSConfig.REGION_NAME,
-    userPoolId=AWSConfig.COGNITO_USERPOOL_ID,
-    client_id=AWSConfig.COGNITO_CLIENT_ID,
+    userPoolId=AWSConfig.COGNITO_DEVICE_USERPOOL_ID,
+    client_id=AWSConfig.COGNITO_DEVICE_CLIENT_ID,
+)
+cognito_current_organization = CognitoCurrentUser(
+    region=AWSConfig.REGION_NAME,
+    userPoolId=AWSConfig.COGNITO_ORGANIZATION_USERPOOL_ID,
+    client_id=AWSConfig.COGNITO_ORGANIZATION_CLIENT_ID,
 )

@@ -22,7 +22,7 @@ rc = RemoteCommand()
 def remote_command(
     device_name: str,
     remote_command_params: RemoteCommandParams,
-    current_user: CognitoClaims = Depends(auth.get_current_user),
+    current_user: CognitoClaims = Depends(auth.cognito_current_organization),
 ) -> Any:
     res = rc.execute_command(device_name, remote_command_params)
     if remote_command_params.cmd == CommandList.TAKE_PICTURE:

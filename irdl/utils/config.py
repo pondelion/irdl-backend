@@ -61,10 +61,18 @@ class _AWSConfig(type):
         os.environ['AWS_DEFAULT_REGION'] = config['REGION_NAME']
     if 'AWS_REGION_NAME' in os.environ:
         config['REGION_NAME'] = os.environ['AWS_REGION_NAME']
-    if 'AWS_COGNITO_USERPOOL_ID' in os.environ:
-        config['COGNITO_USERPOOL_ID'] = os.environ['AWS_COGNITO_USERPOOL_ID']
-    if 'AWS_COGNITO_CLIENT_ID' in os.environ:
-        config['COGNITO_CLIENT_ID'] = os.environ['AWS_COGNITO_CLIENT_ID']
+    if 'AWS_COGNITO_DEVICE_USERPOOL_ID' in os.environ:
+        config['COGNITO_DEVICE_USERPOOL_ID'] = os.environ['AWS_COGNITO_DEVICE_USERPOOL_ID']
+    if 'AWS_COGNITO_DEVICE_CLIENT_ID' in os.environ:
+        config['COGNITO_DEVICE_CLIENT_ID'] = os.environ['AWS_COGNITO_DEVICE_CLIENT_ID']
+    if 'AWS_COGNITO_DEVICE_IDENTITY_POOL_ID' in os.environ:
+        config['COGNITO_DEVICE_IDENTITY_POOL_ID'] = os.environ['AWS_COGNITO_DEVICE_IDENTITY_POOL_ID']
+    if 'AWS_COGNITO_ORGANIZATION_USERPOOL_ID' in os.environ:
+        config['COGNITO_ORGANIZATION_USERPOOL_ID'] = os.environ['AWS_COGNITO_ORGANIZATION_USERPOOL_ID']
+    if 'AWS_COGNITO_ORGANIZATION_CLIENT_ID' in os.environ:
+        config['COGNITO_ORGANIZATION_CLIENT_ID'] = os.environ['AWS_COGNITO_ORGANIZATION_CLIENT_ID']
+    if 'AWS_ACCOUNT_ID' in os.environ:
+        config['ACCOUNT_ID'] = os.environ['AWS_ACCOUNT_ID']
 
     if 'MINIO_USERNAME' in os.environ:
         config['LOCAL_ACCESS_KEY_ID'] = os.environ['MINIO_USERNAME']

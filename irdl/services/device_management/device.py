@@ -3,6 +3,7 @@ from typing import List
 
 import boto3
 
+from ...schemas import DeviceSchema
 from ...utils.config import AWSConfig
 
 
@@ -38,7 +39,7 @@ class DeviceManager:
             identity_id=identity_id,
         )
 
-    def get_device_list(self, organization_name: str) -> List[str]:
+    def get_device_list(self, organization_name: str) -> List[DeviceSchema]:
         response = self._idp_client.list_users(
             UserPoolId=AWSConfig.COGNITO_DEVICE_USERPOOL_ID,
         )
@@ -48,7 +49,24 @@ class DeviceManager:
                 attr['Name']=='custom:organization' and attr['Value']==organization_name for attr in usr['Attributes']
             ])
         ]
-        return organization_users
+        organizationz = [
+            [
+                attr['Value'] for attr in user['Attributes'] if attr['Name']=='custom:organization'
+            ][0]
+            for user in organization_users
+        ]
+        device_dicts = [
+            {
+                'device_name': user['Username'],
+                'organization': organization,
+                'created_at': user['UserCreateDate'],
+                'updated_at': user['UserLastModifiedDate'],
+                'enabled': bool(user['Enabled'])
+            }
+            for user, organization in zip(organization_users, organizationz)
+        ]
+        device_objs = [DeviceSchema.parse_obj(d) for d in device_dicts]
+        return device_objs
 
     def _create_device(
         self,
@@ -146,6 +164,7 @@ class DeviceManager:
             policyName=policy_name,
             target=identity_id
         )
+        return response
 
     def _get_identity_id(self, organization_name: str, device_name: str, password: str) -> str:
         user_name = f'{organization_name}_{device_name}'

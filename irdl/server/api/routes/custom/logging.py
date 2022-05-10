@@ -16,9 +16,13 @@ class LoggingRoute(APIRoute):
         async def custom_route_handler(request: Request) -> Response:
             print('custom_route_handler')
             before = time.time()
-            response: Response = await original_route_handler(request)
+            ex = None
+            response: Response = None
+            try:
+                response = await original_route_handler(request)
+            except Exception as e:
+                ex = e
             duration = round(time.time() - before, 4)
-
             record = {}
             if await request.body():
                 record["request_body"] = (await request.body()).decode("utf-8")
@@ -29,12 +33,15 @@ class LoggingRoute(APIRoute):
             record["request_uri"] = request.url.path
             record["request_method"] = request.method
             record["request_time"] = f'{duration}s'
-            record["status"] = response.status_code
-            # record["response_body"] = response.body.decode("utf-8")
-            record["response_headers"] = {
-                k.decode("utf-8"): v.decode("utf-8") for (k, v) in response.headers.raw
-            }
+            if response:
+                record["status"] = response.status_code
+                # record["response_body"] = response.body.decode("utf-8")
+                record["response_headers"] = {
+                    k.decode("utf-8"): v.decode("utf-8") for (k, v) in response.headers.raw
+                }
             Logger.i('LoggingRoute', record)
+            if ex:
+                raise ex
             return response
 
         return custom_route_handler

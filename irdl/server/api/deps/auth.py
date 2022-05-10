@@ -1,4 +1,4 @@
-from fastapi_cloudauth.cognito import Cognito, CognitoCurrentUser, CognitoClaims
+from fastapi_cloudauth.cognito import Cognito, CognitoCurrentUser
 from irdl.utils.config import AWSConfig
 
 

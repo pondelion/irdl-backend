@@ -16,6 +16,7 @@ uvicorn = {extras = ["standard"], version = "^0.17.6"}
 fastapi-cloudauth = "^0.4.3"
 boto3 = "^1.21.46"
 numpy = "^1.22.3"
+tenacity = "^8.0.1"
 
 [tool.poetry.dev-dependencies]
 

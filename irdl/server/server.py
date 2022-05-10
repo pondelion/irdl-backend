@@ -23,7 +23,8 @@ app.add_middleware(
 if settings.DISABLE_AUTH:
     async def disable_auth_dep(dummy_params: Optional[int] = None):
         return dummy_params
-    app.dependency_overrides[get_current_user] = disable_auth_dep
+    app.dependency_overrides[cognito_current_organization] = disable_auth_dep
+    app.dependency_overrides[cognito_current_device] = disable_auth_dep
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.router.route_class = LoggingRoute

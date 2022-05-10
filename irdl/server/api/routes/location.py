@@ -13,15 +13,6 @@ from ....models.pynamodb import LocationModel
 router = APIRouter(route_class=LoggingRoute)
 
 
-@router.get('', response_model=List[schemas.LocationInDBSchema])
-def get_location(
-    skip: int = 0,
-    limit: int = 100,
-    current_user: CognitoClaims = Depends(auth.cognito_current_organization),
-) -> Any:
-    return 'ok'
-
-
 # @router.get('/{device_name}', response_model=List[schemas.LocationInDBSchema])
 @router.get('/{device_name}')
 def get_location(

@@ -5,3 +5,5 @@ log
 /config
 .env
 .vscode
+get_device_access_token.sh
+get_organization_access_token.sh

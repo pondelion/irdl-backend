@@ -6,28 +6,22 @@ from fastapi_cloudauth.cognito import CognitoClaims
 from .custom.logging import LoggingRoute
 from ..deps import auth
 from .... import schemas, models
-from ....services.remote_command import (
-    RemoteCommandParams,
-    RemoteCommand,
-    CommandList,
-)
+from ....services.device_management import DeviceManager
 from ....utils.image import png_imgfile2base64_url
 
 
 router = APIRouter(route_class=LoggingRoute)
-rc = RemoteCommand()
+dm = DeviceManager()
 
 
-@router.post('/{device_name}')
-def remote_command(
-    device_name: str,
-    remote_command_params: RemoteCommandParams,
+@router.get('')
+def get_device_list(
     current_organization: CognitoClaims = Depends(auth.cognito_current_organization),
-) -> Any:
-    res = rc.execute_command(device_name, remote_command_params)
-    if remote_command_params.cmd == CommandList.TAKE_PICTURE:
-        res = {'image_url': png_imgfile2base64_url(res)}
-    return res
+) -> Dict[str, List[schemas.DeviceSchema]]:
+    # devices = dm.get_device_list(organization_name=current_organization.username)
+    devices = dm.get_device_list(organization_name='organization1')
+    print(devices)
+    return {'devices': devices}
 
 
 @router.get('/health_check')

@@ -48,6 +48,7 @@ class Logger:
     @staticmethod
     def e(tag: str, message: str):
         """error log"""
+        message = '\033[31m'+message+'\033[0m'
         logger = logging.getLogger(LOG_NAME)
         logger.setLevel(logging.ERROR)
         logger.addHandler(file_handler)
@@ -56,6 +57,7 @@ class Logger:
     @staticmethod
     def w(tag: str, message: str):
         """warning log"""
+        message = '\033[33m'+message+'\033[0m'
         logger = logging.getLogger(LOG_NAME)
         logger.setLevel(logging.WARNING)
         logger.addHandler(file_handler)

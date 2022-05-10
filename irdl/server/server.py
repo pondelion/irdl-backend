@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cloudauth.cognito import CognitoClaims
 
 from .api import api_router
-from .api.deps.auth import get_current_user
+from .api.deps.auth import cognito_current_organization, cognito_current_device
 from .api.routes.custom.logging import LoggingRoute
 from ..settings import settings
 
@@ -34,8 +34,15 @@ def health_check():
     return 'healthy'
 
 
-@app.get('/auth_test')
+@app.get('/auth_test/organization')
 def auth_test(
-    current_user: CognitoClaims = Depends(get_current_user),
+    current_organization: CognitoClaims = Depends(cognito_current_organization),
 ):
-    return {'user_info': current_user}
+    return {'organization': current_organization}
+
+
+@app.get('/auth_test/device')
+def auth_test(
+    current_device: CognitoClaims = Depends(cognito_current_device),
+):
+    return {'device': current_device}

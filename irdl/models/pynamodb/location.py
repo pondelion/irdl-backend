@@ -17,6 +17,10 @@ class LocationModel(Model):
     lat = NumberAttribute(null=False)
     lng = NumberAttribute(null=False)
 
+    @classmethod
+    def set_table_name(cls, table_name):
+        cls.Meta.table_name = table_name
+
 
 class LocalLocationModel(Model):
 
@@ -29,3 +33,7 @@ class LocalLocationModel(Model):
     lat = NumberAttribute(null=False)
     lng = NumberAttribute(null=False)
     created_at = UTCDateTimeAttribute(default=dt.now())
+
+    @staticmethod
+    def set_table_name(cls, table_name):
+        cls.Meta.table_name = table_name

@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 import boto3
 
@@ -105,7 +106,7 @@ class DeviceManager:
                 "iot:Subscribe"
             ],
             "Resource": [
-                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topicfilter/{organization_name}/{device_name}"
+                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topicfilter/irdl/command/{organization_name}/{device_name}"
             ]
             }},
             {{
@@ -114,7 +115,7 @@ class DeviceManager:
                 "iot:Receive"
             ],
             "Resource": [
-                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/{organization_name}/{device_name}"
+                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/irdl/command/{organization_name}/{device_name}"
             ]
             }},
             {{
@@ -123,7 +124,8 @@ class DeviceManager:
                 "iot:Publish"
             ],
             "Resource": [
-                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/central_server/*"
+                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/irdl/logging/location/{organization_name}",
+                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/irdl/logging/sensor/{organization_name}"
             ]
             }}
         ]

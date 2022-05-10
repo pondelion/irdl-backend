@@ -36,7 +36,7 @@ class RemoteCommand:
         self._remote_s3_repo = RemoteS3Repository()
         self._local_s3_repo = LocalS3Repository()
 
-    def execute_command(self, device_name: str, remote_command_params: RemoteCommandParams):
+    def execute_command(self, organization_name: str, device_name: str, remote_command_params: RemoteCommandParams):
         if remote_command_params.cmd == CommandList.TAKE_PICTURE:
             if 's3_filepath' not in remote_command_params.params:
                 # raise ValueError('s3_filepath must be specified for TAKE_PICTURE command params.')
@@ -45,12 +45,13 @@ class RemoteCommand:
                     settings.S3_CAMERA_IMAGE_URI, device_name, f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}.png"
                 )
             return self.take_picture(
+                organization_name=organization_name,
                 device_name=device_name,
                 s3_filepath=remote_command_params.params['s3_filepath']
             )
 
-    def take_picture(self, device_name: str, s3_filepath: str) -> str:
-        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{device_name}'
+    def take_picture(self, organization_name: str, device_name: str, s3_filepath: str) -> str:
+        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{organization_name}/{device_name}'
         cmd_json = {
             'cmd': CommandList.TAKE_PICTURE.value,
             's3_filepath': s3_filepath,
@@ -71,8 +72,8 @@ class RemoteCommand:
         ).start()
         return local_filepath
 
-    def start_logging(self, device_name: str, target: str) -> None:
-        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{device_name}'
+    def start_logging(self, organization_name: str, device_name: str, target: str) -> None:
+        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{organization_name}/{device_name}'
         cmd_json = {
             'cmd': CommandList.STATR_LOGGING.value,
             'target': target,
@@ -82,8 +83,8 @@ class RemoteCommand:
             message=cmd_json,
         )
 
-    def stop_logging(self, device_name: str, target: str) -> None:
-        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{device_name}'
+    def stop_logging(self, organization_name: str, device_name: str, target: str) -> None:
+        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{organization_name}/{device_name}'
         cmd_json = {
             'cmd': CommandList.STOP_LOGGING.value,
             'target': target,
@@ -93,8 +94,8 @@ class RemoteCommand:
             message=cmd_json,
         )
 
-    def beep(self, device_name: str) -> None:
-        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{device_name}'
+    def beep(self, organization_name: str, device_name: str) -> None:
+        topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{organization_name}/{device_name}'
         cmd_json = {
             'cmd': CommandList.BEEP.value,
         }

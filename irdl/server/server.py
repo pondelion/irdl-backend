@@ -8,7 +8,11 @@ from .api import api_router
 from .api.deps.auth import cognito_current_organization, cognito_current_device
 from .api.routes.custom.logging import LoggingRoute
 from ..settings import settings
+from ..db import init_rdb, init_dynamodb
 
+
+init_rdb()
+init_dynamodb()
 
 app = FastAPI(title='irdl')
 

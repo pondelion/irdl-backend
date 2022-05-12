@@ -18,8 +18,7 @@ dm = DeviceManager()
 def get_device_list(
     current_organization: CognitoClaims = Depends(auth.cognito_current_organization),
 ) -> Dict[str, List[schemas.DeviceSchema]]:
-    # devices = dm.get_device_list(organization_name=current_organization.username)
-    devices = dm.get_device_list(organization_name='organization1')
+    devices = dm.get_device_list(organization_name=current_organization.username)
     print(devices)
     return {'devices': devices}
 

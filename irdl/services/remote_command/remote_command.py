@@ -1,19 +1,21 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import os
 from threading import Thread
 from typing import Dict, Optional
 import tempfile
+from uuid import UUID, uuid4
 
-import numpy as np
 from pydantic import BaseModel
 
 from .publisher import MessagePublisher
+from ...models.pynamodb.camera_image import CameraImageModel, LocalCameraImageModel
 from ...settings import settings
 from ...repositories.storage.s3 import (
     RemoteS3Repository,
     LocalS3Repository,
 )
+from ...utils import Logger
 
 
 class CommandList(Enum):
@@ -27,6 +29,7 @@ class CommandList(Enum):
 class RemoteCommandParams(BaseModel):
     cmd: CommandList
     params: Optional[Dict] = {}
+    cmd_id: UUID = uuid4()
 
 
 class RemoteCommand:
@@ -37,18 +40,39 @@ class RemoteCommand:
         self._local_s3_repo = LocalS3Repository()
 
     def execute_command(self, organization_name: str, device_name: str, remote_command_params: RemoteCommandParams):
+        Logger.i('RemoteCommand.execute_command', f'{organization_name} : {device_name} : {remote_command_params}')
+        res = None
         if remote_command_params.cmd == CommandList.TAKE_PICTURE:
             if 's3_filepath' not in remote_command_params.params:
                 # raise ValueError('s3_filepath must be specified for TAKE_PICTURE command params.')
                 print('[WARNING] s3_filepath is not specified for TAKE_PICTURE command')
                 remote_command_params.params['s3_filepath'] = os.path.join(
-                    settings.S3_CAMERA_IMAGE_URI, device_name, f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}.png"
+                    settings.S3_CAMERA_IMAGE_URI, organization_name, device_name, f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}.png"
                 )
-            return self.take_picture(
+            res = self.take_picture(
                 organization_name=organization_name,
                 device_name=device_name,
                 s3_filepath=remote_command_params.params['s3_filepath']
             )
+        elif remote_command_params.cmd == CommandList.BEEP:
+            res = self.beep(
+                organization_name=organization_name,
+                device_name=device_name,
+            )
+        elif remote_command_params.cmd == CommandList.STATR_LOGGING:
+            res = self.start_logging(
+                organization_name=organization_name,
+                device_name=device_name,
+                target=remote_command_params.params['target']
+            )
+        elif remote_command_params.cmd == CommandList.STOP_LOGGING:
+            res = self.stop_logging(
+                organization_name=organization_name,
+                device_name=device_name,
+                target=remote_command_params.params['target']
+            )
+        Logger.i('RemoteCommand.execute_command', 'command done')
+        return res
 
     def take_picture(self, organization_name: str, device_name: str, s3_filepath: str) -> str:
         topic = f'{settings.AWS_IOT_COMMAND_TOPIC_NAME}/{organization_name}/{device_name}'
@@ -70,6 +94,18 @@ class RemoteCommand:
         Thread(
             target=lambda: self._local_s3_repo.save(local_filepath, s3_filepath),
         ).start()
+        model_kwargs = {
+            'organization_device_name': f'{organization_name}/{device_name}',
+            'datetime': datetime.now(timezone.utc).isoformat(),
+            's3_filepath': s3_filepath,
+        }
+        camera_obj = CameraImageModel(**model_kwargs)
+        camera_obj.save()
+        try:
+            local_camera_obj = LocalCameraImageModel(**model_kwargs)
+            local_camera_obj.save()
+        except Exception as e:
+            Logger.w('RemoteCommand.take_picture', f'Failed to save came image data to local dynamodb : {e}')
         return local_filepath
 
     def start_logging(self, organization_name: str, device_name: str, target: str) -> None:

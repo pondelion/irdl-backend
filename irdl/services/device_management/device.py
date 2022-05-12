@@ -143,7 +143,8 @@ class DeviceManager:
             ],
             "Resource": [
                 "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/irdl/logging/location/{organization_name}",
-                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/irdl/logging/sensor/{organization_name}"
+                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/irdl/logging/sensor/{organization_name}",
+                "arn:aws:iot:ap-northeast-1:{AWSConfig.ACCOUNT_ID}:topic/irdl/central_server"
             ]
             }}
         ]

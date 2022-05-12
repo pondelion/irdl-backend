@@ -52,7 +52,7 @@ functions:
         - ${env:IMAGE_URL}
       command:
         - api.detect_object_api
-    timeout: 900  # 60*15
+    timeout: 30  # max
     events:
       - http:
           path: api/v1/detect_object
@@ -77,6 +77,6 @@ functions:
           event:
             - "s3:ObjectCreated:*"
           rules:
-            - prefix: camera
+            - prefix: camera/object_detection
             # - suffix: .png
           existing: true

@@ -9,6 +9,7 @@ from .api.deps.auth import cognito_current_organization, cognito_current_device
 from .api.routes.custom.logging import LoggingRoute
 from ..settings import settings
 from ..db import init_rdb, init_dynamodb
+from ..services.remote_command.subscriber import CentralServerMessageHandler
 
 
 init_rdb()
@@ -32,6 +33,9 @@ if settings.DISABLE_AUTH:
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.router.route_class = LoggingRoute
+
+csmh = CentralServerMessageHandler()
+csmh.subscribe()
 
 
 @app.get('/')

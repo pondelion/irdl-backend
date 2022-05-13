@@ -105,7 +105,7 @@ class CentralServerMessageHandler:
         self,
         cmd_id: str,
         callback: Callable,  # lambda topic, msg: ~
-        expires_dt: datetime = datetime.now() + timedelta(minutes=10)
+        expires_dt: datetime = datetime.now() + timedelta(minutes=10),
     ):
         cb_json = {
             'callback': callback,
@@ -139,4 +139,6 @@ class CentralServerMessageHandler:
 
     def _refresh_callback_queues(self):
         now_dt = datetime.now()
-        self._callbacks = {cmd_id: v for cmd_id, v in self._callbacks.items() if self._callbacks['expires_at'] > now_dt}
+        self._callbacks = {
+            cmd_id: v for cmd_id, v in self._callbacks.items() if v['expires_at'] and v['expires_at'] > now_dt
+        }

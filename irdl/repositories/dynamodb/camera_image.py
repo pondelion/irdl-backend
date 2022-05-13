@@ -9,7 +9,7 @@ from ...models.pynamodb import (
 from ...schemas import CameraImageInDBSchema, CameraImageInLocalDBSchema
 
 
-class CameraImageRepository(BaseDynamoDBRepository[CameraImageModel, CameraImageInDBSchema, CameraImageInDBSchema]):
+class CameraImageMetaDataRepository(BaseDynamoDBRepository[CameraImageModel, CameraImageInDBSchema, CameraImageInDBSchema]):
 
     def __init__(self):
         super().__init__(CameraImageModel)
@@ -40,7 +40,9 @@ class CameraImageRepository(BaseDynamoDBRepository[CameraImageModel, CameraImage
         return records
 
 
-class CameraImageLocalRepository(BaseDynamoDBRepository[LocalCameraImageModel, CameraImageInLocalDBSchema, CameraImageInLocalDBSchema]):
+class CameraImageMetaDataLocalRepository(
+    BaseDynamoDBRepository[LocalCameraImageModel, CameraImageInLocalDBSchema, CameraImageInLocalDBSchema]
+):
 
     def __init__(self):
         super().__init__(LocalCameraImageModel)
@@ -67,5 +69,7 @@ class CameraImageLocalRepository(BaseDynamoDBRepository[LocalCameraImageModel, C
                 range_key_condition &= self._model.datetime <= datetime_max
             else:
                 range_key_condition = self._model.datetime <= datetime_max
+        if range_key_condition:
+            query_kwargs['range_key_condition'] = range_key_condition
         records = self._model.query(**query_kwargs)
         return records

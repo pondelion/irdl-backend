@@ -36,8 +36,11 @@ class CameraImageMetaDataRepository(BaseDynamoDBRepository[CameraImageModel, Cam
                 range_key_condition &= self._model.datetime <= datetime_max
             else:
                 range_key_condition = self._model.datetime <= datetime_max
+        if range_key_condition:
+            query_kwargs['range_key_condition'] = range_key_condition
         records = self._model.query(**query_kwargs)
         return records
+
 
 
 class CameraImageMetaDataLocalRepository(

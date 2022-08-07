@@ -25,6 +25,7 @@ class CommandList(Enum):
     STATR_LOGGING = 'START_LOGGING'
     STOP_LOGGING = 'STOP_LOGGING'
     BEEP = 'BEEP'
+    TTS = 'TTS'
 
 
 class RemoteCommandParams(BaseModel):

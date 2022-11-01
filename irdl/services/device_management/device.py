@@ -38,6 +38,10 @@ class DeviceManager:
             policy_name=policy_name,
             identity_id=identity_id,
         )
+        self._attach_thing_principal(
+            thing_name=self._get_user_name(organization_name, device_name),
+            identity_id=identity_id,
+        )
 
     def get_device_list(self, organization_name: str) -> List[DeviceSchema]:
         response = self._idp_client.list_users(
@@ -74,7 +78,8 @@ class DeviceManager:
         device_name: str,
         password: str,
     ):
-        user_name = f'{organization_name}_{device_name}'
+        user_name = self._get_user_name(organization_name, device_name)
+        # create cognito user
         self._idp_client.admin_create_user(
             UserPoolId=AWSConfig.COGNITO_DEVICE_USERPOOL_ID,
             Username=user_name,
@@ -98,6 +103,19 @@ class DeviceManager:
             ChallengeResponses={'USERNAME': user_name, 'NEW_PASSWORD': password},
             Session=session
         )
+
+        # create iot thing
+        thing_name = user_name
+        response = self._iot_client.create_thing(
+            thingName=thing_name,
+            # thingTypeName='string',
+            attributePayload={
+                'attributes': {
+                    'organization_name': 'organization_name'
+                },
+            },
+        )
+
         return response
 
     def _create_policy(
@@ -167,6 +185,13 @@ class DeviceManager:
         )
         return response
 
+    def _attach_thing_principal(self, thing_name: str, identity_id: str):
+        response = self._iot_client.attach_thing_principal(
+            thingName=thing_name,
+            principal=identity_id,
+        )
+        return response
+
     def _get_identity_id(self, organization_name: str, device_name: str, password: str) -> str:
         user_name = f'{organization_name}_{device_name}'
         auth_result = self._idp_client.admin_initiate_auth(
@@ -186,3 +211,6 @@ class DeviceManager:
             }
         )
         return response['IdentityId']
+
+    def _get_user_name(self, organization_name: str, device_name: str) -> str:
+        user_name = f'{organization_name}_{device_name}'

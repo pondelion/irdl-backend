@@ -1,12 +1,14 @@
 from datetime import datetime as dt
 
+from pynamodb.attributes import (NumberAttribute, UnicodeAttribute,
+                                 UTCDateTimeAttribute)
 from pynamodb.models import Model
-from pynamodb.attributes import UnicodeAttribute, NumberAttribute, UTCDateTimeAttribute
 
+from ...settings import settings
 from ...utils.config import AWSConfig
 
 
-class SensorModel(Model):
+class RemoteSensorModel(Model):
 
     class Meta:
         table_name = AWSConfig.DYNAMODB_SENSOR_DATA_TABLE_NAME
@@ -27,6 +29,15 @@ class SensorModel(Model):
     @classmethod
     def set_table_name(cls, table_name):
         cls.Meta.table_name = table_name
+
+    @classmethod
+    def set_organization_name(cls, organization_name: str):
+        organization_table_name = f'{AWSConfig.DYNAMODB_SENSOR_DATA_TABLE_NAME}-{organization_name}'
+        cls.Meta.table_name = organization_table_name
+
+    @classmethod
+    def reset_table_name(cls):
+        cls.Meta.table_name = AWSConfig.DYNAMODB_SENSOR_DATA_TABLE_NAME
 
 
 class LocalSensorModel(Model):
@@ -51,3 +62,19 @@ class LocalSensorModel(Model):
     @classmethod
     def set_table_name(cls, table_name):
         cls.Meta.table_name = table_name
+
+    @classmethod
+    def set_organization_name(cls, organization_name: str):
+        organization_table_name = f'{AWSConfig.DYNAMODB_SENSOR_DATA_TABLE_NAME}-{organization_name}'
+        cls.Meta.table_name = organization_table_name
+
+    @classmethod
+    def reset_table_name(cls):
+        cls.Meta.table_name = AWSConfig.DYNAMODB_SENSOR_DATA_TABLE_NAME
+
+
+SensorModel = None
+if settings.USE_LOCAL_DYNAMODB:
+    SensorModel = LocalSensorModel
+else:
+    SensorModel = RemoteSensorModel

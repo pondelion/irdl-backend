@@ -1,14 +1,14 @@
-from datetime import datetime, timedelta
 import json
 import time
+from datetime import datetime, timedelta
 from typing import Any, Callable, Dict
 
 from awscrt import io, mqtt
 from awsiot import mqtt_connection_builder
 
+from ...settings import settings
 from ...utils.config import AWSConfig
 from ...utils.logger import Logger
-from ...settings import settings
 
 
 class MessageSubscriber:
@@ -75,7 +75,7 @@ class CentralServerMessageHandler:
     _responses = {}
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance == None:
+        if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
@@ -95,11 +95,13 @@ class CentralServerMessageHandler:
                 'CentralServerMessageHandler',
                 f'callbacks with target cmd_id [{msg_json["cmd_id"]}] not found in registred callbacks, ignoreing'
             )
-            return
-        # for cb in self._callbacks[msg_json['cmd_id']]['callback']:
-        #     self._responses[msg_json['cmd_id']] = cb(topic, msg_json)
-        cb = self._callbacks[msg_json['cmd_id']]['callback']
-        self._responses[msg_json['cmd_id']] = cb(topic, msg_json)
+        else:
+            # for cb in self._callbacks[msg_json['cmd_id']]['callback']:
+            #     self._responses[msg_json['cmd_id']] = cb(topic, msg_json)
+            cb = self._callbacks[msg_json['cmd_id']]['callback']
+            # self._responses[msg_json['cmd_id']] = cb(topic, msg_json)
+            cb(topic, msg_json)
+        self._responses[msg_json['cmd_id']] = msg_json
 
     def add_receive_callback(
         self,
@@ -107,6 +109,7 @@ class CentralServerMessageHandler:
         callback: Callable,  # lambda topic, msg: ~
         expires_dt: datetime = datetime.now() + timedelta(minutes=10),
     ):
+        cmd_id = str(cmd_id)
         cb_json = {
             'callback': callback,
             'expires_at': expires_dt,
@@ -118,8 +121,10 @@ class CentralServerMessageHandler:
         self._callbacks[cmd_id] = cb_json
 
     def wait_until_response(self, cmd_id: str, timeout_sec: float = 60) -> Any:
+        cmd_id = str(cmd_id)
         base_dt = datetime.now()
         while (datetime.now() - base_dt).total_seconds() < timeout_sec:
+            print(self._responses.keys()) 
             if cmd_id in self._responses:
                 res = self._responses.pop(cmd_id)
                 return res
@@ -134,6 +139,7 @@ class CentralServerMessageHandler:
         expires_dt: datetime = datetime.now() + timedelta(minutes=10),
         timeout_sec: float = 60
     ) -> Any:
+        cmd_id = str(cmd_id)
         self.add_receive_callback(cmd_id, callback, expires_dt)
         return self.wait_until_response(cmd_id, timeout_sec)
 

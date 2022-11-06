@@ -1,13 +1,15 @@
+import os
 from datetime import datetime as dt
 
+from pynamodb.attributes import (ListAttribute, UnicodeAttribute,
+                                 UTCDateTimeAttribute)
 from pynamodb.models import Model
-from pynamodb.attributes import UnicodeAttribute, ListAttribute, MapAttribute, UTCDateTimeAttribute
 
-from ...utils.config import AWSConfig
 from ...settings import settings
+from ...utils.config import AWSConfig
 
 
-class ObjectDetectionResultModel(Model):
+class RemoteObjectDetectionResultModel(Model):
 
     class Meta:
         table_name = settings.DYNAMODB_OBJECT_DETECTION_TABLE_NAME
@@ -25,7 +27,7 @@ class LocalObjectDetectionResultModel(Model):
 
     class Meta:
         table_name = settings.DYNAMODB_OBJECT_DETECTION_TABLE_NAME
-        host = 'http://localhost:8000'
+        host = f'http://localhost:{os.environ["LOCAL_DYNAMODB_PORT"]}'
 
     organization_device_name = UnicodeAttribute(hash_key=True)
     datetime = UnicodeAttribute(range_key=True)
@@ -34,3 +36,10 @@ class LocalObjectDetectionResultModel(Model):
     # datetime = UnicodeAttribute(null=False)
     od_result = ListAttribute(null=False)
     created_at = UTCDateTimeAttribute(default=dt.now())
+
+
+ObjectDetectionResultModel = None
+if settings.USE_LOCAL_DYNAMODB:
+    ObjectDetectionResultModel = LocalObjectDetectionResultModel
+else:
+    ObjectDetectionResultModel = RemoteObjectDetectionResultModel

@@ -1,8 +1,7 @@
 import os
 from typing import Optional
-import secrets
 
-from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn
+from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -10,7 +9,7 @@ class Settings(BaseSettings):
     # SECRET_KEY: str = secrets.token_urlsafe(32)
     # ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8days
     # SERVER_NAME: str
-    SERVER_HOST: AnyHttpUrl
+    # SERVER_HOST: AnyHttpUrl
 
     DISABLE_AUTH: bool = False
 
@@ -34,7 +33,7 @@ class Settings(BaseSettings):
 
     @property
     def LOCAL_MYSQL_DATABASE_URI(self) -> str:
-        if self.self.LOCAL_RDB_NAME is None:
+        if self.LOCAL_RDB_NAME is None:
             raise ValueError('Local rdb name is not set.')
         return f'mysql://{self.LOCAL_RDB_USERNAME}:{self.LOCAL_RDB_PASSWORD}@{self.LOCAL_RDB_HOST}:{self.LOCAL_RDB_PORT}/{self.LOCAL_RDB_NAME}?charset=utf8mb4'
 
@@ -50,6 +49,8 @@ class Settings(BaseSettings):
     DYNAMODB_SENSOR_DATA_TABLE_NAME: str = 'irdl-sensor'
     DYNAMODB_OBJECT_DETECTION_TABLE_NAME: str = 'irld-object-detection'
     DYNAMODB_CAMERA_IMAGE_DATA_TABLE_NAME: str = 'irld-camera-image'
+    USE_LOCAL_DYNAMODB: bool = False
+    USE_LOCAL_S3: bool = False
 
     @property
     def S3_CAMERA_IMAGE_URI(self) -> str:
@@ -57,7 +58,6 @@ class Settings(BaseSettings):
 
 
 settings = Settings(
-    SERVER_HOST='http://127.0.0.0.1',
     DISABLE_AUTH=False,
     REMOTE_RDB_HOST='a',
     REMOTE_RDB_NAME='irdl',

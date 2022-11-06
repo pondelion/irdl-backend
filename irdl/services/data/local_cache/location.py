@@ -3,27 +3,30 @@ from typing import Dict, List, Optional, Union
 
 from pynamodb.expressions.condition import Comparison
 
-from ....models.pynamodb.location import LocalLocationModel, LocationModel
-from ....repositories.dynamodb import LocationRepository, LocationLocalRepository
+from ....models.pynamodb.location import (LocalLocationModel,
+                                          RemoteLocationModel)
+from ....repositories.dynamodb import (LocationLocalRepository,
+                                       LocationRepository)
 from ....utils.logger import Logger
 
 
 class LocationLocalCache:
 
-    def __init__(self, sync_time_sec: float = 60*30):
+    def __init__(self, sync_time_sec: float = 60 * 30):
         self._local_dynamo_repo = LocationLocalRepository()
         self._remote_dynamo_repo = LocationRepository()
         self._sync_time_sec = sync_time_sec
 
-    def get_all(self) -> Union[LocationModel, LocalLocationModel]:
+    def get_all(self) -> Union[RemoteLocationModel, LocalLocationModel]:
         local_latest_record = self._local_dynamo_repo.get_latest()
+        return local_latest_record
 
     def get(
         self,
         hash_key: Union[str, int, float],
         range_key: Optional[Union[str, int, float, Comparison]] = None,
         filter_condition: Optional[Comparison] = None,
-    ) ->  List[Union[LocationModel, LocalLocationModel]]:
+    ) ->  List[Union[RemoteLocationModel, LocalLocationModel]]:
         local_latest_record = self._local_dynamo_repo.get_latest(
             device_name=hash_key
         )

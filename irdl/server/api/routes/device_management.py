@@ -14,13 +14,13 @@ router = APIRouter(route_class=LoggingRoute)
 dm = DeviceManager()
 
 
-@router.get('')
+@router.get('', response_model = List[schemas.DeviceSchema])
 def get_device_list(
     current_organization: CognitoClaims = Depends(auth.cognito_current_organization),
-) -> Dict[str, List[schemas.DeviceSchema]]:
+) -> List[schemas.DeviceSchema]:
     devices = dm.get_device_list(organization_name=current_organization.username)
     print(devices)
-    return {'devices': devices}
+    return devices
 
 
 @router.get('/health_check')

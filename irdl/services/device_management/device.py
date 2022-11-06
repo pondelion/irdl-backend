@@ -111,7 +111,7 @@ class DeviceManager:
             # thingTypeName='string',
             attributePayload={
                 'attributes': {
-                    'organization_name': 'organization_name'
+                    'organization_name': organization_name
                 },
             },
         )
@@ -214,3 +214,6 @@ class DeviceManager:
 
     def _get_user_name(self, organization_name: str, device_name: str) -> str:
         user_name = f'{organization_name}_{device_name}'
+
+    def cleanup_all_resources(self, organization_name: str):
+        pass

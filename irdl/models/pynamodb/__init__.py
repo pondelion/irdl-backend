@@ -1,16 +1,7 @@
-from .location import (
-    LocationModel,
-    LocalLocationModel,
-)
-from .sensor import (
-    SensorModel,
-    LocalSensorModel,
-)
-from .camera_image import (
-    CameraImageModel,
-    LocalCameraImageModel,
-)
-from .object_detection import (
-    ObjectDetectionResultModel,
-    LocalObjectDetectionResultModel,
-)
+from .camera_image import (CameraImageModel, LocalCameraImageModel,
+                           RemoteCameraImageModel)
+from .location import LocalLocationModel, LocationModel, RemoteLocationModel
+from .object_detection import (LocalObjectDetectionResultModel,
+                               ObjectDetectionResultModel,
+                               RemoteObjectDetectionResultModel)
+from .sensor import LocalSensorModel, RemoteSensorModel, SensorModel

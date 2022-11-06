@@ -204,7 +204,7 @@ class OrganizationManager:
         Logger.i('OrganizationManager', f'Created : {res}')
         return res
 
-    def creanup_all_resources(self, organization_name: str):
+    def cleanup_all_resources(self, organization_name: str):
         # Clean up iot topic rule
         location_rule_name = self._get_location_iot_topic_rule_name(organization_name)
         try:

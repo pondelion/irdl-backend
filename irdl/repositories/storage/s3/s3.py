@@ -1,12 +1,12 @@
 import os
-from typing import List, Optional
 from time import sleep
+from typing import List, Optional
 
-from ..base import BaseStorageRepository
 from ....aws.resource import S3 as S3_resource
 from ....aws.resource_local import S3_LOCAL as S3_resource_local
 from ....settings import settings
 from ....utils.logger import Logger
+from ..base import BaseStorageRepository
 
 
 class BaseS3Repository(BaseStorageRepository):
@@ -26,7 +26,7 @@ class BaseS3Repository(BaseStorageRepository):
                 },
             )
             Logger.w('S3', f'created bucket [{bucket_name}]')
-        except s3_resource.meta.client.exceptions.BucketAlreadyOwnedByYou as e:
+        except s3_resource.meta.client.exceptions.BucketAlreadyOwnedByYou:
             Logger.w('S3', f'bucket [{bucket_name}] already exists')
         self._bucket = s3_resource.Bucket(bucket_name)
 
@@ -47,22 +47,22 @@ class BaseS3Repository(BaseStorageRepository):
         self,
         s3_filepath: str,
         local_filepath: str,
-        n_retry: Optional[int] = None,
+        n_retry: int = 1,
         retry_interval_sec: float = 1.0,
-    ) -> str:
+    ) -> Optional[str]:
         s3_prefix = f's3://{self._bucket_name}/'
         filepath = s3_filepath.replace(s3_prefix, '')
-        try:
-            object = self._bucket.Object(filepath)
-            object.download_file(local_filepath)
-        except Exception as e:
-            print(e)
-            if n_retry is not None and n_retry > 0:
+        success = None
+        while success is None and n_retry > 0:
+            try:
+                object = self._bucket.Object(filepath)
+                object.download_file(local_filepath)
+                success = local_filepath
+            except Exception as e:
+                print(e)
                 sleep(retry_interval_sec)
-                self.get(s3_filepath, local_filepath, n_retry-1, retry_interval_sec)
-            else:
-                raise e
-        return local_filepath
+            n_retry = n_retry - 1
+        return success
 
     def get_filelist(
         self,

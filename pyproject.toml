@@ -20,6 +20,7 @@ tenacity = "^8.0.1"
 awsiotsdk = "^1.11.1"
 flake8 = "^5.0.4"
 black = "^22.10.0"
+kafka-python = "^2.0.2"
 
 [tool.poetry.dev-dependencies]
 

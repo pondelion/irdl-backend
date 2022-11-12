@@ -141,6 +141,7 @@ def remote_command_take_picture(
             cmd=CommandList.TAKE_PICTURE,
         )
     res = rc.execute_command(organization_name, device_name, remote_command_params)
+    res = {'image_url': png_imgfile2base64_url(res)} if res is not None else None
     return res
 
 

@@ -56,6 +56,10 @@ class Settings(BaseSettings):
     def S3_CAMERA_IMAGE_URI(self) -> str:
         return os.path.join('s3://', self.S3_BUCKET_NAME, 'camera')
 
+    ANALYSIS_SERVER_TOPIC_NAME: str = 'job/analysis'
+    ANALYSIS_SERVER_HOST: str
+    ANALYSIS_SERVER_JOB_PORT: int
+
 
 settings = Settings(
     DISABLE_AUTH=False,
@@ -67,4 +71,6 @@ settings = Settings(
     LOCAL_RDB_NAME='irdl',
     LOCAL_RDB_USERNAME=os.environ['LOCAL_RDB_USERNAME'],
     LOCAL_RDB_PASSWORD=os.environ['LOCAL_RDB_PASSWORD'],
+    ANALYSIS_SERVER_HOST=os.environ['ANALYSIS_SERVER_HOST'],
+    ANALYSIS_SERVER_JOB_PORT=int(os.environ['ANALYSIS_SERVER_JOB_PORT']),
 )

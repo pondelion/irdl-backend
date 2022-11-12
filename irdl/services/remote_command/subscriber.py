@@ -124,7 +124,7 @@ class CentralServerMessageHandler:
         cmd_id = str(cmd_id)
         base_dt = datetime.now()
         while (datetime.now() - base_dt).total_seconds() < timeout_sec:
-            print(self._responses.keys()) 
+            # print(self._responses.keys())
             if cmd_id in self._responses:
                 res = self._responses.pop(cmd_id)
                 return res
